@@ -1,0 +1,4 @@
+
+# GeoIP Database
+GeoLite2-City.mmdb
+*.mmdb
