@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -10,7 +10,9 @@ import {
   Title,
   Tooltip,
   Legend
-} from 'chart.js';
+}
+from 'chart.js';
+import 'leaflet/dist/leaflet.css';
 import '../styles/main.css';
 
 ChartJS.register(
@@ -52,16 +54,12 @@ interface Analytics {
   }[];
 }
 
-const Analytics: React.FC = () => {  const [analytics, setAnalytics] = useState<Analytics | null>(null);
+const Analytics: React.FC = () => {
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [error, setError] = useState<string>('');
   const [selectedMarker, setSelectedMarker] = useState<LoginAttempt | null>(null);
-  const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
+  const [mapCenter, setMapCenter] = useState<[number, number]>([0, 0]);
   const [mapZoom, setMapZoom] = useState(2);
-
-  const mapContainerStyle = {
-    width: '100%',
-    height: '400px'
-  };
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -78,29 +76,24 @@ const Analytics: React.FC = () => {  const [analytics, setAnalytics] = useState<
           throw new Error('Failed to fetch analytics data');
         }
 
-        const data = await response.json();
+        const data: Analytics = await response.json();
         setAnalytics(data);
-
-        // Set map center to the most recent login attempt with valid coordinates
         const recentWithCoords = data.recent_attempts.find(
-          attempt => attempt.latitude && attempt.longitude
+          (attempt: LoginAttempt) => attempt.latitude && attempt.longitude
         );
+
         if (recentWithCoords) {
-          setMapCenter({ 
-            lat: recentWithCoords.latitude, 
-            lng: recentWithCoords.longitude 
-          });
+          setMapCenter([recentWithCoords.latitude, recentWithCoords.longitude]);
           setMapZoom(4);
         }
-      } catch (error) {
-        console.error('Error fetching analytics:', error);
+      } catch (err) {
+        console.error('Error fetching analytics:', err);
         setError('Failed to load analytics data');
       }
     };
 
     fetchAnalytics();
-    const interval = setInterval(fetchAnalytics, 30000); // Refresh every 30 seconds
-
+    const interval = setInterval(fetchAnalytics, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -113,17 +106,17 @@ const Analytics: React.FC = () => {  const [analytics, setAnalytics] = useState<
   }
 
   const chartData = {
-    labels: analytics.hourly_attempts.map(item => item.hour),
+    labels: analytics.hourly_attempts.map((item) => item.hour),
     datasets: [
       {
         label: 'Successful Attempts',
-        data: analytics.hourly_attempts.map(item => item.successful),
+        data: analytics.hourly_attempts.map((item) => item.successful),
         borderColor: 'rgb(75, 192, 192)',
         tension: 0.1,
       },
       {
         label: 'Failed Attempts',
-        data: analytics.hourly_attempts.map(item => item.failed),
+        data: analytics.hourly_attempts.map((item) => item.failed),
         borderColor: 'rgb(255, 99, 132)',
         tension: 0.1,
       },
@@ -173,8 +166,8 @@ const Analytics: React.FC = () => {  const [analytics, setAnalytics] = useState<
 
       <div className="map-container">
         <MapContainer
-          center={[0, 0]}
-          zoom={2}
+          center={mapCenter}
+          zoom={mapZoom}
           style={{ height: '400px', width: '100%' }}
         >
           <TileLayer
@@ -186,6 +179,9 @@ const Analytics: React.FC = () => {  const [analytics, setAnalytics] = useState<
               <Marker
                 key={index}
                 position={[attempt.latitude, attempt.longitude]}
+                eventHandlers={{
+                  click: () => setSelectedMarker(attempt),
+                }}
               >
                 <Popup>
                   <div>

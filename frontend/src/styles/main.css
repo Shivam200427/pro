@@ -104,7 +104,7 @@ form button:hover {
 .recent-activity td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #eee;
 }
 
 .recent-activity th {
@@ -112,18 +112,18 @@ form button:hover {
   font-weight: 600;
 }
 
-.recent-activity tr.success td {
-  background-color: #e8f5e9;
+.recent-activity tr.success {
+  background-color: rgba(40, 167, 69, 0.1);
 }
 
-.recent-activity tr.failure td {
-  background-color: #ffebee;
+.recent-activity tr.failure {
+  background-color: rgba(220, 53, 69, 0.1);
 }
 
 /* Map Container */
 .map-container {
   height: 400px;
-  margin-top: 20px;
+  margin: 20px 0;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -422,4 +422,30 @@ form button:hover {
 
 .button-group button[type="button"]:hover {
   background-color: #7f8c8d;
+}
+
+.chart-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 15px;
+  margin: 20px auto;
+  max-width: 600px;
+  text-align: center;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
 }

@@ -6,15 +6,18 @@ import Register from './components/Register';
 import Analytics from './components/Analytics';
 import AdminDashboard from './components/AdminDashboard';
 import UserDashboard from './components/UserDashboard';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute, { ProtectedRouteProps } from './components/ProtectedRoute';
 
 function App() {
   return (
     <Router>
       <div className="App">
         <Routes>
+          {/* Public routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          
+          {/* Protected admin routes */}
           <Route 
             path="/admin" 
             element={
@@ -24,6 +27,16 @@ function App() {
             } 
           />
           <Route 
+            path="/analytics" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <Analytics />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Protected user routes */}
+          <Route 
             path="/dashboard" 
             element={
               <ProtectedRoute>
@@ -31,7 +44,12 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          
+          {/* Default redirect */}
           <Route path="/" element={<Navigate to="/login" />} />
+          
+          {/* Catch all route - redirects to login */}
+          <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>
     </Router>
